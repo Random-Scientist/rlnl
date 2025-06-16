@@ -1,0 +1,11 @@
+[package]
+name = "rlnl"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bitflags = "2.9.1"
+byteserde = "0.6.2"
+byteserde_derive = "0.6.2"
+sealed = "0.6.0"
+strum = { version = "0.27.1", features = ["derive"] }
