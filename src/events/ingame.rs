@@ -157,6 +157,7 @@ pub struct FireMiss {
     item_size: i32,
 }
 register_event_type! { FireMiss, FireMiss }
+
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct FireMissEntry {
     hit_point: UnityCompressedVec3<32768>,
@@ -164,6 +165,7 @@ pub struct FireMissEntry {
     packed_hit_hitself: u8,
     target_type: TargetType,
 }
+
 #[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct MultipleFireMisses {
     #[byteserde(replace(hits.len()))]
@@ -175,3 +177,4 @@ pub struct MultipleFireMisses {
     item_category: i16,
     item_size: i16,
 }
+register_event_type! { MultipleFireMisses, MultipleFireMisses }
