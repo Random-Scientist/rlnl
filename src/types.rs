@@ -8,21 +8,21 @@ use byteserde_derive::{ByteDeserializeSlice, ByteSerializeHeap};
 use strum::FromRepr;
 
 #[derive(Debug, Default, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
-pub struct UnityCompressedVec3<const FACTOR: u32> {
+pub struct CompressedVec3<const FACTOR: u32> {
     pub x: i16,
     pub y: i16,
     pub z: i16,
 }
 #[derive(Debug, Default, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
-pub struct UnityCompressedQuat<const FACTOR: u32> {
+pub struct CompressedQuat<const FACTOR: u32> {
     pub x: i16,
     pub y: i16,
     pub z: i16,
 }
 #[derive(Debug, Default, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct PosQuatPair {
-    pos: UnityCompressedVec3<768>,
-    rot: UnityCompressedQuat<4>,
+    pos: CompressedVec3<768>,
+    rot: CompressedQuat<4>,
 }
 #[derive(Debug, Default, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct Byte3 {

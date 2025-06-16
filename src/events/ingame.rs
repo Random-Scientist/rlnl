@@ -4,11 +4,11 @@ use byteserde_derive::{ByteDeserializeSlice, ByteSerializeHeap};
 use crate::{
     events::register_event_type,
     types::{
-        BinaryWriterString, Byte3, CubeStatus, IngameStatId, TargetType, UnityCompressedVec3,
-        VoteType,
+        BinaryWriterString, Byte3, CompressedVec3, CubeStatus, IngameStatId, TargetType, VoteType,
     },
     util::bitflag_bits,
 };
+// TODO typeify ItemDescriptor (itemcategory and size enums)
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct SetFinalGameScore {
     pub player_id: u8,
@@ -96,11 +96,12 @@ pub struct DestroyCubesFull {
     pub shooting_machine_id: i16,
     pub hit_machine_id: i16,
     pub item_category: i16,
+    pub item_size: i16,
     pub stack_count: u8,
     pub target_type: TargetType,
     pub weapon_damage: i32,
-    pub hit_effect_offset: UnityCompressedVec3<768>,
-    pub hit_effect_normal: UnityCompressedVec3<255>,
+    pub hit_effect_offset: CompressedVec3<768>,
+    pub hit_effect_normal: CompressedVec3<255>,
     #[byteserde(replace(hit_cubes.len()))]
     pub num_hit_cubes: u16,
     #[byteserde(deplete(usize::from(num_hit_cubes)))]
@@ -116,8 +117,8 @@ pub struct DestroyCubeEffectOnly {
     pub item_category: i16,
     pub stack_count: u8,
     pub target_type: TargetType,
-    pub hit_effect_offset: UnityCompressedVec3<768>,
-    pub hit_effect_normal: UnityCompressedVec3<255>,
+    pub hit_effect_offset: CompressedVec3<768>,
+    pub hit_effect_normal: CompressedVec3<255>,
     pub hit_cube: Byte3,
 }
 
@@ -137,8 +138,8 @@ register_event_type! { DestroyCubeNoEffect, DestroyCubeNoEffect }
 
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct WeaponFireEffect {
-    launch_position: UnityCompressedVec3<768>,
-    direction: UnityCompressedVec3<768>,
+    launch_position: CompressedVec3<768>,
+    direction: CompressedVec3<768>,
     shooting_machine_id: i16,
     shooting_player_id: u8,
     weapon_grid_key: Byte3,
@@ -148,8 +149,8 @@ register_event_type! { WeaponFireEffect, FireWeaponEffect }
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct FireMiss {
     shooting_machine_id: u16,
-    hit_point: UnityCompressedVec3<32768>,
-    hit_normal: UnityCompressedVec3<255>,
+    hit_point: CompressedVec3<32768>,
+    hit_normal: CompressedVec3<255>,
     time_stamp: f32,
     packed_hit_hitself: u8,
     target_type: TargetType,
@@ -160,8 +161,8 @@ register_event_type! { FireMiss, FireMiss }
 
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct FireMissEntry {
-    hit_point: UnityCompressedVec3<32768>,
-    hit_normal: UnityCompressedVec3<255>,
+    hit_point: CompressedVec3<32768>,
+    hit_normal: CompressedVec3<255>,
     packed_hit_hitself: u8,
     target_type: TargetType,
 }
