@@ -1,9 +1,6 @@
 use byteserde_derive::{ByteDeserializeSlice, ByteSerializeHeap};
 
-use crate::{
-    events::register_event_type,
-    types::{BinaryWriterString, StringCode},
-};
+use crate::types::BinaryWriterString;
 
 #[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct PlayerIDAndName {
@@ -19,7 +16,6 @@ pub struct PlayerIDsAndNames {
     #[byteserde(deplete(num_players as usize))]
     pub players: Vec<PlayerIDAndName>,
 }
-register_event_type! { PlayerIDsAndNames, PlayerIDs }
 
 #[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct PlayerIDs {
@@ -28,9 +24,6 @@ pub struct PlayerIDs {
     #[byteserde(deplete(usize::try_from(num_ids).unwrap()))]
     pub players: Vec<i32>,
 }
-register_event_type! { PlayerIDs, HostAIs }
-
-register_event_type! { StringCode, WarnPlayer }
 
 #[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct LoadingProgress {
@@ -38,5 +31,4 @@ pub struct LoadingProgress {
     pub progress: f32,
 }
 
-register_event_type! { LoadingProgress, BroadcastLoadingProgress }
 // EacMessage/EacMessageDependency probably unneeded, skipped

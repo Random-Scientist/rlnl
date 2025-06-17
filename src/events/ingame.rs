@@ -2,19 +2,18 @@ use byteserde::prelude::{ByteDeserializeSlice, ByteSerializeHeap};
 use byteserde_derive::{ByteDeserializeSlice, ByteSerializeHeap};
 
 use crate::{
-    events::register_event_type,
     types::{
-        BinaryWriterString, Byte3, CompressedVec3, CubeStatus, IngameStatId, TargetType, VoteType,
+        BinaryWriterString, Byte3, ByteFloat, CompressedVec3, CubeStatus, DVec3, GameEndReason,
+        HitCubeInfo, IngameStatId, ItemDescriptor, PingType, PosQuatPair, SQuat, SVec3, TargetType,
+        VoteType,
     },
     util::bitflag_bits,
 };
-// TODO typeify ItemDescriptor (itemcategory and size enums)
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct SetFinalGameScore {
     pub player_id: u8,
     pub score: i32,
 }
-register_event_type! { SetFinalGameScore, SetFinalGameScore }
 
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct UpdateGameStats {
@@ -24,7 +23,6 @@ pub struct UpdateGameStats {
     pub score: u32,
     pub delta_score: u32,
 }
-register_event_type! { UpdateGameStats, UpdateGameStats }
 
 #[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct UpdateVotingAfterBattle {
@@ -32,14 +30,12 @@ pub struct UpdateVotingAfterBattle {
     pub amount: i32,
     pub vote_type: VoteType,
 }
-register_event_type! { UpdateVotingAfterBattle, UpdateVotingAfterBattle }
 
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct Kill {
     pub killee_player_id: i32,
     pub killer_player_id: u8,
 }
-register_event_type! { Kill, MachineDestroyedConfirmed }
 
 bitflag_bits! {
     #[derive(Debug, Clone, Copy)]
@@ -89,7 +85,6 @@ pub struct MultiPlayerInputChanged {
     #[byteserde(deplete(usize::from(num_players)))]
     pub changes: Vec<PlayerIdAndInputData>,
 }
-register_event_type! { MultiPlayerInputChanged, OnServerReceivedInputChange }
 
 #[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct DestroyCubesFull {
@@ -108,7 +103,6 @@ pub struct DestroyCubesFull {
     pub hit_cubes: Vec<CubeStatus>,
     pub timestamp: f32,
 }
-register_event_type! { DestroyCubesFull, DestroyCubesFull }
 
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct DestroyCubeEffectOnly {
@@ -122,8 +116,6 @@ pub struct DestroyCubeEffectOnly {
     pub hit_cube: Byte3,
 }
 
-register_event_type! { DestroyCubeEffectOnly, DestroyCubeEffectOnly }
-
 #[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct DestroyCubeNoEffect {
     pub shooting_machine_id: i16,
@@ -134,48 +126,200 @@ pub struct DestroyCubeNoEffect {
     #[byteserde(deplete(usize::from(num_hits)))]
     pub hit_cubes: Vec<CubeStatus>,
 }
-register_event_type! { DestroyCubeNoEffect, DestroyCubeNoEffect }
 
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct WeaponFireEffect {
-    launch_position: CompressedVec3<768>,
-    direction: CompressedVec3<768>,
-    shooting_machine_id: i16,
-    shooting_player_id: u8,
-    weapon_grid_key: Byte3,
+    pub launch_position: CompressedVec3<768>,
+    pub direction: CompressedVec3<768>,
+    pub shooting_machine_id: i16,
+    pub shooting_player_id: u8,
+    pub weapon_grid_key: Byte3,
 }
-register_event_type! { WeaponFireEffect, FireWeaponEffect }
 
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct FireMiss {
-    shooting_machine_id: u16,
-    hit_point: CompressedVec3<32768>,
-    hit_normal: CompressedVec3<255>,
-    time_stamp: f32,
-    packed_hit_hitself: u8,
-    target_type: TargetType,
-    item_category: i32,
-    item_size: i32,
+    pub shooting_machine_id: u16,
+    pub hit_point: CompressedVec3<32768>,
+    pub hit_normal: CompressedVec3<255>,
+    pub time_stamp: f32,
+    pub packed_hit_hitself: u8,
+    pub target_type: TargetType,
+    // can't use ItemDescriptor because they decided not to pack them for this event...
+    pub item_category: i32,
+    pub item_size: i32,
 }
-register_event_type! { FireMiss, FireMiss }
 
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct FireMissEntry {
-    hit_point: CompressedVec3<32768>,
-    hit_normal: CompressedVec3<255>,
-    packed_hit_hitself: u8,
-    target_type: TargetType,
+    pub hit_point: CompressedVec3<32768>,
+    pub hit_normal: CompressedVec3<255>,
+    pub packed_hit_hitself: u8,
+    pub target_type: TargetType,
 }
 
 #[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct MultipleFireMisses {
     #[byteserde(replace(hits.len()))]
-    num_hits: u8,
-    shooting_machine_id: i16,
+    pub num_hits: u8,
+    pub shooting_machine_id: i16,
     #[byteserde(deplete(usize::from(num_hits)))]
-    hits: Vec<FireMissEntry>,
-    timestamp: f32,
-    item_category: i16,
-    item_size: i16,
+    pub hits: Vec<FireMissEntry>,
+    pub timestamp: f32,
+    pub desc: ItemDescriptor,
 }
-register_event_type! { MultipleFireMisses, MultipleFireMisses }
+
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct GameStart {
+    // bool
+    pub is_reconnecting: u8,
+}
+
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct GameEnd {
+    pub reason: GameEndReason,
+}
+
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct RequestPing {
+    pub player_id: u8,
+    pub requester: u8,
+    pub timestamp: f32,
+}
+
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct PlayerId {
+    pub player: u8,
+}
+
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct MapPing {
+    pub sender: i32,
+    pub team_id: i32,
+    pub ty: PingType,
+    pub pos: DVec3,
+}
+
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct LockOnNotifier {
+    pub firing_player_id: u8,
+    pub target_player_id: u8,
+    pub lock_stage: u8,
+    pub locked_cube_pos: Byte3,
+    pub item_category: i32,
+    pub item_size: i32,
+}
+
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct ShieldModuleEvent {
+    pub pos: PosQuatPair,
+    pub firing_player_id: u8,
+}
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct TeleportActivateEffect {
+    //bool
+    pub activate: u8,
+    pub player_id: u8,
+    pub module_index: u8,
+}
+
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct SpawnEmpLocator {
+    pub pos: CompressedVec3<768>,
+    pub range: f32,
+    pub countdown: f32,
+    pub stun_duration: f32,
+    pub owner_id: u8,
+    pub owner_machine_id: i16,
+}
+
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct NetworkStunnedMachineEffect {
+    pub machine_id: i32,
+    //bool
+    pub is_stunned: u8,
+    pub owner_id: i32,
+}
+
+#[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct Taunt {
+    pub machine_id: i32,
+    pub taunt_id: BinaryWriterString,
+    pub relative_position: SVec3,
+    pub relative_orientation: SQuat,
+}
+
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct CosmeticAction {
+    pub owner_machine_id: i32,
+    pub cosmetic_action_data_index: i32,
+}
+
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct SelectWeapon {
+    pub machine_id: u8,
+    pub item_category: u32,
+    pub item_size: u32,
+}
+
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct HealAllyEntry {
+    pub cube_info: HitCubeInfo,
+    pub type_performing_healing: TargetType,
+}
+#[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct HealAllyCubes {
+    pub healed_machine: i16,
+    pub shooting_machine: i16,
+    pub shooting_player_id: u8,
+    pub item_size: i32,
+    pub hit_effect_offset: CompressedVec3<768>,
+    pub hit_effect_normal: CompressedVec3<255>,
+    pub time_stamp: f32,
+    #[byteserde(replace(hit_cubes.len()))]
+    pub num_healed_cubes: u16,
+    #[byteserde(deplete(num_healed_cubes as usize))]
+    pub hit_cubes: Vec<HealAllyEntry>,
+}
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct RespawnTime {
+    pub owner: u8,
+    pub waiting_time: i16,
+}
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct GameLoseWin {
+    pub winning_team: u8,
+    pub end_reason: GameEndReason,
+}
+#[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct CurrentSurrenderVotes {
+    players_on_team: i32,
+    #[byteserde(replace(votes.len()))]
+    num_votes: i32,
+    //vec<bool>
+    #[byteserde(deplete(usize::try_from(num_votes).expect("negative number of votes in CurrentSurrenderVotes")))]
+    votes: Vec<u8>,
+}
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct SurrenderDeclined {
+    surrendering_player_id: i32,
+    game_time_elapsed: f32,
+}
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct SurrenderTimes {
+    player_cooldown_seconds: i32,
+    team_cooldown_seconds: i32,
+    surrender_timeout_seconds: i32,
+    initial_surrender_timeout_seconds: i32,
+}
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct TeamBaseBoolean {
+    team: u8,
+    //bool
+    value: u8,
+}
+#[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct TeamBaseState {
+    base_team_or_mining_point_index: u8,
+    current_progress: ByteFloat<4>,
+    max_progress: ByteFloat<4>,
+}

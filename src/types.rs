@@ -30,6 +30,26 @@ pub struct Byte3 {
     pub y: u8,
     pub z: u8,
 }
+
+#[derive(Debug, Default, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct DVec3 {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+}
+#[derive(Debug, Default, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct SVec3 {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+}
+#[derive(Debug, Default, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct SQuat {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+    pub w: f32,
+}
 #[derive(Debug, Default, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct ByteFloat<const FACTOR: u16>(u8);
 
@@ -78,6 +98,18 @@ pub struct IngameStat {
 pub struct CubeState {
     pub loc: Byte3,
     pub status: CubeStatus,
+}
+#[derive(Debug, Default, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct ItemDescriptor {
+    category: ItemCategory,
+    size: ItemSize,
+}
+#[derive(Debug, Default, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
+pub struct GameModeSettings {
+    game_time_minutes: i32,
+    kill_limit: i32,
+    respawn_heal_duration: f32,
+    respawn_full_heal_duration: f32,
 }
 
 #[derive(Debug, Default, Clone, Copy)]
@@ -232,6 +264,83 @@ macro_rules! enum_serialize {
         }
     };
 }
+#[derive(Debug, Default, Clone, Copy, FromRepr, PartialEq, Eq, Hash)]
+#[repr(i32)]
+pub enum PingType {
+    MoveHere,
+    GoingHere,
+    Danger,
+    #[default]
+    Unknown,
+}
+enum_serialize! { PingType, i32 }
+
+#[derive(Debug, Default, Clone, Copy, FromRepr, PartialEq, Eq, Hash)]
+#[repr(i16)]
+pub enum ItemCategory {
+    #[default]
+    NotAFunctionalItem = 0,
+    Wheel = 1,
+    Hover = 2,
+    Wing = 3,
+    Rudder = 4,
+    Thruster = 5,
+    InsectLeg = 6,
+    MechLeg = 7,
+    Ski = 8,
+    TankTrack = 9,
+    Rotor = 10,
+    SprinterLeg = 11,
+    Propeller = 12,
+    Laser = 100,
+    Plasma = 200,
+    Mortar = 250,
+    Rail = 300,
+    Nano = 400,
+    Tesla = 500,
+    Aeroflak = 600,
+    Ion = 650,
+    Seeker = 701,
+    Chaingun = 750,
+    ShieldModule = 800,
+    GhostModule = 801,
+    BlinkModule = 802,
+    EmpModule = 803,
+    WindowmakerModule = 804,
+    EnergyModule = 900,
+}
+
+enum_serialize! { ItemCategory, i16}
+#[derive(Debug, Default, Clone, Copy, FromRepr, PartialEq, Eq, Hash)]
+#[repr(u8)]
+pub enum GameEndReason {
+    #[default]
+    TimeOut,
+    NoPlayersRemaining,
+    OneTeamRemaining,
+    BaseCaptured,
+    BaseDestroyed,
+    PitMaxKillsAchieved,
+    TeamDeathMatchMaxKillsAchieved,
+    TeamDeathMatchTimeExpiredSuddenDeath,
+    TeamDeathMatchTimeExpiredMostKills,
+    Surrendered,
+}
+enum_serialize! { GameEndReason, u8 }
+
+#[derive(Debug, Default, Clone, Copy, FromRepr, PartialEq, Eq, Hash)]
+#[repr(i16)]
+pub enum ItemSize {
+    #[default]
+    NotAWeapon = 0,
+    T0 = 100,
+    T1 = 200,
+    T2 = 300,
+    T3 = 400,
+    T4 = 500,
+    T5 = 600,
+}
+enum_serialize! { ItemSize, i16}
 #[derive(Debug, Default, Clone, Copy, FromRepr, PartialEq, Eq, Hash)]
 #[repr(u32)]
 pub enum VoteType {
