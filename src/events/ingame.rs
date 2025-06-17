@@ -292,34 +292,34 @@ pub struct GameLoseWin {
 }
 #[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct CurrentSurrenderVotes {
-    players_on_team: i32,
+    pub players_on_team: i32,
     #[byteserde(replace(votes.len()))]
-    num_votes: i32,
+    pub num_votes: i32,
     //vec<bool>
     #[byteserde(deplete(usize::try_from(num_votes).expect("negative number of votes in CurrentSurrenderVotes")))]
-    votes: Vec<u8>,
+    pub votes: Vec<u8>,
 }
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct SurrenderDeclined {
-    surrendering_player_id: i32,
-    game_time_elapsed: f32,
+    pub surrendering_player_id: i32,
+    pub game_time_elapsed: f32,
 }
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct SurrenderTimes {
-    player_cooldown_seconds: i32,
-    team_cooldown_seconds: i32,
-    surrender_timeout_seconds: i32,
-    initial_surrender_timeout_seconds: i32,
+    pub player_cooldown_seconds: i32,
+    pub team_cooldown_seconds: i32,
+    pub surrender_timeout_seconds: i32,
+    pub initial_surrender_timeout_seconds: i32,
 }
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct TeamBaseBoolean {
-    team: u8,
+    pub team: u8,
     //bool
-    value: u8,
+    pub value: u8,
 }
 #[derive(Debug, Clone, Copy, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct TeamBaseState {
-    base_team_or_mining_point_index: u8,
-    current_progress: ByteFloat<4>,
-    max_progress: ByteFloat<4>,
+    pub base_team_or_mining_point_index: u8,
+    pub current_progress: ByteFloat<4>,
+    pub max_progress: ByteFloat<4>,
 }

@@ -12,7 +12,7 @@ pub struct PlayerIDAndName {
 #[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct PlayerIDsAndNames {
     #[byteserde(replace(players.len()))]
-    num_players: u8,
+    pub num_players: u8,
     #[byteserde(deplete(num_players as usize))]
     pub players: Vec<PlayerIDAndName>,
 }
@@ -20,7 +20,7 @@ pub struct PlayerIDsAndNames {
 #[derive(Debug, Clone, ByteDeserializeSlice, ByteSerializeHeap)]
 pub struct PlayerIDs {
     #[byteserde(replace(players.len()))]
-    num_ids: i32,
+    pub num_ids: i32,
     #[byteserde(deplete(usize::try_from(num_ids).unwrap()))]
     pub players: Vec<i32>,
 }
