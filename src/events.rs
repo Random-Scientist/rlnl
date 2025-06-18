@@ -229,7 +229,7 @@ pub struct HealedCubes {
     pub type_performing_healing: TargetType,
     pub target_type: TargetType,
     #[byteserde(replace(hit_cubes.len()))]
-    num_healed_cubes: u16,
+    pub num_healed_cubes: u16,
     #[byteserde(deplete(num_healed_cubes as usize))]
     pub hit_cubes: Vec<HitCubeInfo>,
 }

@@ -40,6 +40,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
+name = "polariton"
+version = "0.2.0"
+source = "git+https://git.ngram.ca/OpenJam/polariton.git?rev=a27e90106037555d4aa10059270df9bdc9080d76#a27e90106037555d4aa10059270df9bdc9080d76"
+
+[[package]]
 name = "proc-macro2"
 version = "1.0.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -64,6 +69,7 @@ dependencies = [
  "bitflags",
  "byteserde",
  "byteserde_derive",
+ "polariton",
  "sealed",
  "strum",
 ]

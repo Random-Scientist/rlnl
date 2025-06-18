@@ -393,7 +393,7 @@ enum_serialize! { TargetType, u8 }
 #[derive(Debug, Default, Clone, Copy, FromRepr, PartialEq, Eq, Hash)]
 #[repr(u8)]
 pub enum EqualizerState {
-    // starts
+    // start
     Start = 1,
     // end types
     #[default]
